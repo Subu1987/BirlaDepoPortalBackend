@@ -1,0 +1,7 @@
+node_modules
+public
+.env
+node_modules/
+*.log
+*.log.*
+*.log.old

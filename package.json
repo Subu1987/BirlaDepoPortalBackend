@@ -1,0 +1,36 @@
+{
+  "name": "birla",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "applicationinsights": "^2.3.6",
+    "bcrypt": "^4.0.1",
+    "body-parser": "^1.19.0",
+    "cmake-js": "^6.1.0",
+    "express": "^4.17.1",
+    "express-handlebars": "^4.0.4",
+    "forever": "^2.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.10.4",
+    "morgan": "^1.10.0",
+    "mysql": "^2.18.1",
+    "node-addon-api": "^3.0.0",
+    "node-gyp": "^6.1.0",
+    "node-pre-gyp": "^0.14.0",
+    "node-rfc": "^1.2.0",
+    "nodemailer": "^6.9.5",
+    "pidusage": "^2.0.19",
+    "pm2": "^4.4.0",
+    "prebuild": "^10.0.0",
+    "prebuild-install": "^5.3.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
