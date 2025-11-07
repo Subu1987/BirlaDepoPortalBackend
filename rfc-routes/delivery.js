@@ -404,25 +404,21 @@ router.post(
   checkAuth,
   poolCreator,
   (req, res, next) => {
-    const { material, plant } = req.body;
-    console.log("Fetching valuation types for:", material, plant);
+    const { IM_MATNR, IM_WERKS } = req.body;
+    console.log("Fetching valuation types for:", IM_MATNR, IM_WERKS);
 
     const pool = req.pool;
 
-    if (material && plant) {
+    if (IM_MATNR && IM_WERKS) {
       pool
         .acquire()
         .then((client) => {
-          console.log("connection opened..");
           client
             .call("ZRFC_VALUATION_TYPE", {
-              IM_MATNR: material,
-              IM_WERKS: plant,
+              IM_MATNR,
+              IM_WERKS,
             })
             .then((data) => {
-              console.log("RFC Data received:", data);
-
-              // Assuming valuation types are returned as an array in data.IT_VALUATION
               res.json({
                 status: true,
                 msg: "Valuation types fetched successfully.",
@@ -430,30 +426,22 @@ router.post(
               });
             })
             .catch((err) => {
-              console.error("RFC Error:", err);
-              res.json({
-                status: false,
-                msg: "RFC call failed.",
-              });
+              res.json({ status: false, msg: "RFC call failed." });
             })
             .finally(() => {
-              console.log("closing ...");
-              pool.release(client, function () { });
+              pool.release(client);
             });
         })
-        .catch((err) => {
-          console.error("Pool Error:", err);
-          res.json({
-            status: false,
-            msg: "Server error.",
-          });
+        .catch(() => {
+          res.json({ status: false, msg: "Server error." });
         });
     } else {
       res.json({
         status: false,
-        msg: "Please provide valid 'material' and 'plant' in body.",
+        msg: "Please provide valid 'IM_MATNR' and 'IM_WERKS' in body.",
       });
     }
+
   }
 );
 
