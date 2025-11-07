@@ -422,7 +422,7 @@ router.post(
               res.json({
                 status: true,
                 msg: "Valuation types fetched successfully.",
-                result: data.IT_VALUATION || [],
+                result: data || [],
               });
             })
             .catch((err) => {
