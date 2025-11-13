@@ -13,6 +13,12 @@ const physicalInventoryRoutes = require("./rfc-routes/physicalInventory");
 const rfcReducer = require("./rfc-routes/rfc-reducer");
 const So = require("./rfc-routes/so");
 var path = require("path");
+const ImageModel = require("./schema/ImageSchema");
+const dbConnection = require("./connections/dbConnection");
+
+// certificates
+const fs = require("fs");
+const https = require("https");
 
 console.log("connected");
 console.log(process.env.MYSQL_HOST);
@@ -20,25 +26,9 @@ console.log(process.env.MYSQL_HOST);
 const debug = require("debug")("node-angular");
 const http = require("http");
 
-const mongo = require("mongoose");
-mongoConnection = require("./connections/dbConnection");
+//let appInsights = require("applicationinsights");
 
-const imageSchema = new mongo.Schema(
-  {
-    depot_code: String,
-    material_code: String,
-    cfa_code: String,
-    image: {
-      base64: String,
-      imageFormat: String,
-    },
-  },
-  {
-    timestamps: true,
-  }
-);
-
-const ImageModel = mongo.model("StockImages", imageSchema);
+//appInsights.setup("84fbb6ab-8874-44cc-90d2-493ce87df797").start();
 
 var app = express();
 
@@ -66,12 +56,12 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/", physicalInventoryRoutes);
 app.use("/", deliveryRfcRoutes);
 app.use("/", invoiceRfcRoutes);
 app.use("/", goodReceiptRoutes);
 app.use("/", ReportRoutes);
 app.use("/", So);
+app.use("/", physicalInventoryRoutes);
 app.use("/rfc", rfcRoutes);
 app.use("/rfc-reducer", rfcReducer);
 app.use("/login", loginRoute);
@@ -167,8 +157,39 @@ const onListening = () => {
   debug("Listening on " + bind);
 };
 
+// Certificate
+const privateKey = fs.readFileSync(
+  "/home/bcladmin/certs/2025/birlaprivate.key",
+  "utf8"
+);
+const certificate = fs.readFileSync(
+  "/home/bcladmin/certs/2025/birlacert.pem",
+  "utf8"
+);
+const ca = fs.readFileSync("/home/bcladmin/certs/2025/birlakey.pem", "utf8");
+
+const credentials = {
+  key: privateKey,
+  cert: certificate,
+  ca: ca,
+};
+
 const port = normalizePort(process.env.PORT || "3000");
-app.set("port", port);
+const httpsServer = https.createServer(credentials, app);
+/* redirect all 80 requests to 443*/
+/* redirect all requests to port 443 */
+process
+  .on("unhandledRejection", (reason, p) => {
+    console.error(reason, "Unhandled Rejection at Promise", p);
+  })
+  .on("uncaughtException", (err) => {
+    console.error(err, "Uncaught Exception thrown");
+  });
+// app.set("port", port);
 app.on("error", onError);
 app.on("listening", onListening);
-app.listen(port);
+//app.listen(port);
+
+httpsServer.listen(443, () => {
+  console.log("HTTPS Server running on port 443");
+});
