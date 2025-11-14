@@ -5,17 +5,15 @@ module.exports = (req, res, next) => {
     let rfcSettings = {
       // user: req.user.user_code,
       // passwd: req.user.rfc_password,
-      user: "BPCOESD01",
+      user: "dpportal",
       passwd: "Bcl@1234",
-      ashost: "10.235.100.36",
-      sysid: "BCQ",
-      sysnr: "90",
+      mshost: "sapprdci",
+      sysid: "BCP",
+      group: "PARIVARDHAN",
       client: "700",
-      low: 4,
-      high: 20,
     };
 
-    console.log("rfcSettings", rfcSettings);
+    //    console.log("rfcSettings", rfcSettings);
     const pool = new rfc.Pool(rfcSettings);
     req.pool = pool;
     res.set("Connection", "close");
