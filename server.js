@@ -26,22 +26,20 @@ console.log(process.env.MYSQL_HOST);
 const debug = require("debug")("node-angular");
 const http = require("http");
 
-//let appInsights = require("applicationinsights");
-
-//appInsights.setup("84fbb6ab-8874-44cc-90d2-493ce87df797").start();
-
 var app = express();
 
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(morgan("dev"));
-app.use(
-  express.static(path.join(__dirname, "public"), {
-    setHeaders: function (res, path, stat) {
-      res.set("x-timestamp", Date.now());
-    },
-  })
-);
+
+/* ❌ REMOVE STATIC PUBLIC FOLDER LOADING */
+// app.use(
+//   express.static(path.join(__dirname, "public"), {
+//     setHeaders: function (res, path, stat) {
+//       res.set("x-timestamp", Date.now());
+//     },
+//   })
+// );
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -87,7 +85,6 @@ app.post("/upload", (req, res) => {
       console.log(err);
       res.status(500).send("Error uploading image");
     } else {
-      // send back the image id
       res.status(200).send({
         id: result._id,
         msg: "Image uploaded successfully",
@@ -112,23 +109,15 @@ app.get("/image/:id", (req, res) => {
   });
 });
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname + "/public/birla.html"));
-});
+/* ❌ REMOVE FRONTEND CATCH-ALL ROUTE */
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname + "/public/birla.html"));
+// });
 
 const normalizePort = (val) => {
   var port = parseInt(val, 10);
-
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
-
-  if (port >= 0) {
-    // port number
-    return port;
-  }
-
+  if (isNaN(port)) return val;
+  if (port >= 0) return port;
   return false;
 };
 
@@ -141,11 +130,9 @@ const onError = (error) => {
     case "EACCES":
       console.error(bind + " requires elevated privileges");
       process.exit(1);
-      break;
     case "EADDRINUSE":
       console.error(bind + " is already in use");
       process.exit(1);
-      break;
     default:
       throw error;
   }
@@ -157,7 +144,6 @@ const onListening = () => {
   debug("Listening on " + bind);
 };
 
-// Certificate
 const privateKey = fs.readFileSync(
   "/home/bcladmin/certs/2025/birlaprivate.key",
   "utf8"
@@ -176,8 +162,7 @@ const credentials = {
 
 const port = normalizePort(process.env.PORT || "3000");
 const httpsServer = https.createServer(credentials, app);
-/* redirect all 80 requests to 443*/
-/* redirect all requests to port 443 */
+
 process
   .on("unhandledRejection", (reason, p) => {
     console.error(reason, "Unhandled Rejection at Promise", p);
@@ -185,10 +170,9 @@ process
   .on("uncaughtException", (err) => {
     console.error(err, "Uncaught Exception thrown");
   });
-// app.set("port", port);
+
 app.on("error", onError);
 app.on("listening", onListening);
-//app.listen(port);
 
 httpsServer.listen(443, () => {
   console.log("HTTPS Server running on port 443");
