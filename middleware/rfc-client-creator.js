@@ -3,8 +3,10 @@ const rfc = require("node-rfc");
 module.exports = (req, res, next) => {
   try {
     let rfcSettings = {
-      user: req.user.user_code,
-      passwd: req.user.rfc_password,
+      // user: req.user.user_code,
+      // passwd: req.user.rfc_password,
+      user: "dpportal",
+      passwd: "Bcl@1234",
       ashost: "10.235.100.37",
       sysid: "UCP",
       sysnr: "90",
