@@ -6,6 +6,8 @@ const connection = require("../connections/connection");
 var rfc = require("node-rfc");
 const { escape, escapeId } = require("mysql");
 
+const ValuationType = require("../models/ValuationType");
+
 // const rfcSettings = require("../connections/rfc-conf");
 // const pool = new rfc.Pool(rfcSettings);
 
@@ -692,6 +694,65 @@ router.post("/delete_incoterms_by_id", (req, res) => {
 });
 
 // END incoterms section
+
+// Valuation Type Start
+
+router.post("/get_valuation_types", checkAuth, async (req, res) => {
+  try {
+    const list = await ValuationType.find({}).sort({ createdAt: -1 });
+
+    return resMaker(0, list, "Fetched", res);
+  } catch (err) {
+    console.error(err);
+    return resMaker(1, err, "Could not fetch", res);
+  }
+});
+
+router.post("/add_valuation_type", checkAuth, async (req, res) => {
+  try {
+    const { DEPT_CODE, VALUATION_TYPE } = req.body;
+
+    if (!DEPT_CODE || !VALUATION_TYPE) {
+      return resMaker(
+        1,
+        [],
+        "Please provide DEPT_CODE and VALUATION_TYPE",
+        res
+      );
+    }
+
+    const newEntry = new ValuationType({
+      DEPT_CODE,
+      VALUATION_TYPE,
+    });
+
+    await newEntry.save();
+
+    return resMaker(0, newEntry, "Added Successfully", res);
+  } catch (err) {
+    console.error(err);
+    return resMaker(1, err, "Could not add", res);
+  }
+});
+
+router.post("/delete_valuation_type_by_id", checkAuth, async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    if (!id) {
+      return resMaker(1, [], "ID is required", res);
+    }
+
+    await ValuationType.findByIdAndDelete(id);
+
+    return resMaker(0, [], "Deleted Successfully", res);
+  } catch (err) {
+    console.error(err);
+    return resMaker(1, err, "Could not delete", res);
+  }
+});
+
+// Valuation Type End
 
 // gr materials
 router.post("/add_gr_materials", checkAuth, poolCreator, (req, response) => {
